@@ -61,6 +61,15 @@ class Command(BaseCommand):
         - objects_to_keep: A map where the keys are classes, and the values are a
          set of the objects of that class we should keep.
         """
+
+        # add all models not referenced in the fixture
+        all_models = apps.get_models(
+            include_auto_created=True, include_swapped=True)
+
+        for model_cls in all_models:
+            if model_cls not in objects_to_keep.keys():
+                objects_to_keep[model_cls] = set()
+
         for class_ in objects_to_keep.keys():
             current = class_.objects.all()
             current_ids = set([x.pk for x in current])
